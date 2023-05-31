@@ -102,7 +102,7 @@ def crear_citas():
     texto_telefono = tk.Entry(citas)
     texto_telefono.place(x = 160, y = 430)
 
-
+    #Hola
     citas.mainloop()
 
 def cancelar_citas():

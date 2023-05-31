@@ -15,10 +15,11 @@ menu_inicial.geometry("600x500")
 #Titulo RETEVE
 label_reteve = tk.Label(menu_inicial, text = "RETEVE")
 label_reteve.place(x = 10, y = 10)
+label_reteve.config(font=("Arial", 20))
 
 #Variables funcion crear citas
 numero_cita = 0
-
+tipo_cita = IntVar()
 
 
 
@@ -30,12 +31,77 @@ def crear_citas():
     citas.geometry("600x500")
 
     #Crear acceso a las variables fuera de la funcion
-    global numero_cita
+    global numero_cita, tipo_cita
     numero_cita += 1
 
     #Titulo del numero de cita
     label_num_cita = tk.Label(citas, text = "Número de cita: " + str(numero_cita))
     label_num_cita.place(x = 10, y = 10)
+    label_num_cita.config(font=("Arial", 15))
+
+    #Solicitud de datos
+
+    #Tipo de cita
+    label_tipo_cita = tk.Label(citas, text = " Tipo de cita: ")
+    label_tipo_cita.place(x = 100, y = 80)
+    label_tipo_cita.config(font=("Arial", 10))
+    t1 = tk.Radiobutton(citas, text="Primera vez", variable=tipo_cita, value=1)
+    t2 = tk.Radiobutton(citas, text="Reinspección", variable=tipo_cita, value=2)
+    t1.place(x = 120, y = 100)
+    t2.place(x = 120, y = 120)
+    #--------------------------------------------------------------------------------------------
+    #Placa
+    label_placa = tk.Label(citas, text = "Número de placa: ")
+    label_placa.place(x = 100, y = 140)
+    texto_placa = tk.Entry(citas)
+    texto_placa.place(x = 200, y = 140)
+    #--------------------------------------------------------------------------------------------
+    #Tipo de vehículo
+    label_vehiculo = tk.Label(citas, text = "Tipos de vehiculos:")
+    label_vehiculo.place(x = 100, y = 160)
+    vehiculos = tk.Listbox(citas, selectmode=tk.UNITS, width=75)
+    lista_tipos_vehiculos = ["Automovil particular y vehiculo de carga liviana (menor o iguala 3500kg)",
+                             "Automovil particular y vehiculo de carga liviana (mayor a 3500kg, menor a 8000kg)",
+                             "Vehiculo de carga pesada y cabezales (mayor o iguala a 8000kg)",
+                             "Taxis",
+                             "Autobuses, buses y microbuses",
+                             "Motocicletas",
+                             "Equipo especial de obras",
+                             "Equipo especial agricola (maquinaria agricula)"]
+    for elemento in lista_tipos_vehiculos:
+        vehiculos.insert(tk.END, elemento)
+    vehiculos.place(x = 80, y = 180)
+    # Función que se ejecuta al hacer clic en el botón aceptar
+    def obtener_seleccion():
+        seleccion = vehiculos.curselection()
+        if seleccion:
+            indice = seleccion[0]
+            elemento = vehiculos.get(indice)
+    #--------------------------------------------------------------------------------------------
+    #Marca del vehiculo
+    label_marca = tk.Label(citas, text = "Marca del vehiculo: ")
+    label_marca.place(x = 100, y = 360)
+    texto_marca = tk.Entry(citas)
+    texto_marca.place(x = 210, y = 360)
+    #--------------------------------------------------------------------------------------------
+    #Modelo
+    label_modelo = tk.Label(citas, text = "Modelo: ")
+    label_modelo.place(x = 100, y = 383)
+    texto_modelo = tk.Entry(citas)
+    texto_modelo.place(x = 160, y = 383)
+    #--------------------------------------------------------------------------------------------
+    #Propietario
+    label_propietario = tk.Label(citas, text = "Propietario: ")
+    label_propietario.place(x = 100, y = 405)
+    texto_propietario = tk.Entry(citas)
+    texto_propietario.place(x = 165, y = 405)
+    #--------------------------------------------------------------------------------------------
+    #Telefono
+    label_telefono = tk.Label(citas, text = "Telefono: ")
+    label_telefono.place(x = 100, y = 430)
+    texto_telefono = tk.Entry(citas)
+    texto_telefono.place(x = 160, y = 430)
+
 
     citas.mainloop()
 

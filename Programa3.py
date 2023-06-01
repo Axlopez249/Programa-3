@@ -28,7 +28,7 @@ tipo_cita = IntVar()
 def crear_citas():
     citas = tk.Tk()
     citas.title("Programacion de citas")
-    citas.geometry("600x500")
+    citas.geometry("600x750")
 
     #Crear acceso a las variables fuera de la funcion
     global numero_cita, tipo_cita
@@ -101,8 +101,35 @@ def crear_citas():
     label_telefono.place(x = 100, y = 430)
     texto_telefono = tk.Entry(citas)
     texto_telefono.place(x = 160, y = 430)
+    #--------------------------------------------------------------------------------------------
+    #Correo electrónico
+    label_correo = tk.Label(citas, text = "Correo electrónico: ")
+    label_correo.place(x = 100, y = 450)
+    texto_correo = tk.Entry(citas)
+    texto_correo.place(x = 210, y = 450)
+    #Validacion del correo
+    correo = texto_correo.get()
+    #Toma el import del gmail y revisa la estrctura
+    #E: un elemento string de email
+    #S: true si el email es correcto
+    def is_valid_email(email):
+        from validate_email import validate_email
 
-    #Hola
+        is_valid = validate_email(email, verify=True)
+
+        if is_valid:
+            return 
+        else:
+            texto_correo.config(text = " ")
+            return messagebox.showinfo("Error", "Correo electrónico inválido")
+ 
+    #-------------------------------------------------------------------------
+    #Direccion
+    label_direccion = tk.Label(citas, text = "Direccion: ")
+    label_direccion.place(x = 100, y = 480)
+    texto_direccion = tk.Entry(citas)
+    texto_direccion.place(x = 160, y = 480)
+    
     citas.mainloop()
 
 def cancelar_citas():

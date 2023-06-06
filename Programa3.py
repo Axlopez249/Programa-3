@@ -23,18 +23,23 @@ label_reteve.config(font=("Arial", 20))
 #Variables funcion crear citas
 numero_cita = 0
 tipo_cita = IntVar()
-
-
+citas = {}
+lineas_trabajo = 0
+minutos_revision = 20
+meses_para_citas = 1
+hora_inicio = 6
+hora_final = 21
+opcion_fechas = StringVar()
 
 
 #Funciones
 def crear_citas():
     citas = tk.Tk()
     citas.title("Programacion de citas")
-    citas.geometry("600x750")
+    citas.geometry("900x750")
 
     #Crear acceso a las variables fuera de la funcion
-    global numero_cita, tipo_cita
+    global numero_cita, tipo_cita, opcion_fechas
     numero_cita += 1
 
     #Titulo del numero de cita
@@ -133,6 +138,172 @@ def crear_citas():
     texto_direccion = tk.Entry(citas)
     texto_direccion.place(x = 160, y = 480)
     
+    #--------------------------------------------------------------------------
+    #Opcion para tomar las fechas
+    #Esta funcion es para crear los list_box cuando el usuario marca la casilla de seleccion automatica
+    #E: Vacia
+    #S: La creacion y seleccion de las fechas
+    def opcion_automatica(): 
+        global hora_final, hora_inicio, meses_para_citas, minutos_revision
+        h_i = hora_inicio
+        h_f = hora_final
+        #Se muestran las fechas y horas
+
+        #Proceso para las fechas
+        cantidad_dias = meses_para_citas * 30
+        # Obtener la fecha actual
+        fecha_actual = datetime.date.today()
+
+        # Obtener la fecha final (dentro de un mes)
+        fecha_final = fecha_actual + datetime.timedelta(days = cantidad_dias)
+
+        # Iterar desde la fecha actual hasta la fecha final
+        fecha_actual_iteracion = fecha_actual
+        fechas_dias = []
+        while fecha_actual_iteracion <= fecha_final:
+            fechas_dias.append(fecha_actual_iteracion)
+            fecha_actual_iteracion += datetime.timedelta(days=1)
+
+
+        #Se muestra el proceso para las horas por dia
+        lista_horas_por_dia = []
+        minutos = 0
+        while h_i < h_f:
+            
+            if minutos == 60:
+                h_i += 1
+                minutos = 0
+            if minutos > 60:
+                h_i += 1
+                minutos = (minutos-60)
+            lista_horas_por_dia.append((h_i, minutos))
+            minutos += minutos_revision
+
+        #Procesos para la creacion de los listbox
+    
+        #Se muestra la Listbox de las fechas
+        # Crear el Frame 
+        label_horas = Label(citas, text = "Fechas en días")
+        label_horas.place(x = 130, y = 540)
+        frame_dias = tk.Frame(citas)
+        frame_dias.place(x = 90, y = 560)
+
+        fechas = tk.Listbox(frame_dias, selectmode=tk.UNITS, width=40)
+        fechas.pack(side = 'left',fill = 'y' )
+
+        scrollbar_fechas = Scrollbar(frame_dias, orient="vertical",command=fechas.yview)
+        scrollbar_fechas.pack(side="right", fill="y")
+
+        fechas.config(yscrollcommand=scrollbar_fechas.set)
+
+        for elemento in fechas_dias:
+            fechas.insert(tk.END, elemento)
+
+
+        # Crear el Frame de las horas
+        label_horas = Label(citas, text = "Horas y minutos")
+        label_horas.place(x = 430, y = 540)
+        frame = tk.Frame(citas)
+        frame.place(x = 390, y = 560)
+
+        horas = tk.Listbox(frame, selectmode=tk.UNITS, width=40)
+        horas.pack(side = 'left',fill = 'y' )
+
+        scrollbar_horas = Scrollbar(frame, orient="vertical",command=horas.yview)
+        scrollbar_horas.pack(side="right", fill="y")
+
+        horas.config(yscrollcommand=scrollbar_horas.set)
+
+        for elemento in lista_horas_por_dia:
+            horas.insert(tk.END, elemento)
+        return
+    #Esta funcion se llama cuando el usuario decide solicitar la cita de forma manual
+    #E: Vacia
+    #S: Validaciones de la fecha
+    def opcion_manual():
+        label_fecha = Label(citas, text = "Indique la fecha a solicitar (aa-mm-dd) ")
+        label_fecha.place(x = 100, y = 540)
+        entry_fecha = Entry(citas, width=10)
+        entry_fecha.place(x = 320, y = 540)
+
+        label_hora = Label(citas, text = "Indique la hora a solicitar (hh,mm) ")
+        label_hora.place(x = 100, y = 560)
+        entry_hora = Entry(citas, width=10)
+        entry_hora.place(x = 320, y = 560)
+
+        #Funcion para consultar si una cita esta disponible cuando le usuario decide solicitarla de forma manual
+        #E: vacia
+        #S: Un mensaje de afirmacion si esta disponible o no de lo contrario
+        def consultar_citas():
+            global hora_final, hora_inicio, minutos_revision, meses_para_citas
+            #Aqui se toman las variables globales para no modificarlas y modificar su contenido
+            h_i = hora_inicio
+            h_f = hora_final
+            fecha = entry_fecha.get()
+            tiempo = entry_hora.get()
+            lista_tiempo = tiempo.split(",")
+            horas = int(lista_tiempo[0])
+            minu = int(lista_tiempo[1])
+
+            #Se sacan las fechas disponibles segun los minutos por revision
+            lista_horas_por_dia = []
+            minutos = 0
+            while h_i < h_f:
+                
+                if minutos == 60:
+                    h_i += 1
+                    minutos = 0
+                if minutos > 60:
+                    h_i += 1
+                    minutos = (minutos-60)
+                lista_horas_por_dia.append((h_i, minutos))
+                minutos += minutos_revision
+
+
+            cantidad_dias = meses_para_citas * 30
+            # Obtener la fecha actual
+            fecha_actual = datetime.date.today()
+
+            # Obtener la fecha final (dentro de un mes)
+            fecha_final = fecha_actual + datetime.timedelta(days = cantidad_dias)
+
+            # Iterar desde la fecha actual hasta la fecha final
+            fecha_actual_iteracion = fecha_actual
+            fechas_dias = []
+            while fecha_actual_iteracion <= fecha_final:
+                fechas_dias.append(fecha_actual_iteracion)
+                fecha_actual_iteracion += datetime.timedelta(days=1)
+
+            #Se recorre la lista creada para verificar que esa hora exista y esté disponible
+            for elemento in lista_horas_por_dia:
+                if elemento[0] == horas and elemento[1] == minu:
+                    for ele in fechas_dias:
+                        
+                        if str(ele) == fecha:
+                            messagebox.showinfo("Cita", "Fecha disponible")
+                            return 
+            
+            
+            messagebox.showerror("Cita", "Fecha no disponible")
+            return
+
+        boton_consultar = tk.Button(citas, text="Consultar", width=10, command = consultar_citas)
+        boton_consultar.place(x=100, y=580)
+
+
+
+    #Radio botones de la opciones para solicitar la cita
+    manual = tk.Radiobutton(citas, text="Manual", variable=opcion_fechas, value="opcion1", command=opcion_manual)
+    manual.place(x = 100, y = 500)
+    automatico = tk.Radiobutton(citas, text="Automático", variable=opcion_fechas, value="opcion2", command=opcion_automatica)
+    automatico.place(x = 100, y = 520)
+    #--------------------------------------------------------------------------
+    
+
+    """boton_aceptar = tk.Button(citas, text="" , width=10)
+    boton_aceptar.place()"""
+
+
     citas.mainloop()
 
 def cancelar_citas():

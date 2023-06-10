@@ -21,19 +21,46 @@ label_reteve.place(x = 10, y = 10)
 label_reteve.config(font=("Arial", 20))
 
 #Variables funcion crear citas
+#Ok, voy
+#
 numero_cita = 0
 tipo_cita = IntVar()
 citas = {}
-lineas_trabajo = 0
-minutos_revision = 20
-meses_para_citas = 1
+lineas = 6
+minutos_revision = 30
+dias_reinspeccion = 30
+cant_meses = 1
+cant_fallas = 4
+porcentaje = 13.0
 hora_inicio = 6
 hora_final = 21
+fecha = ""
+hora = ()
+precios_vehiculos = [10920, 14380, 14380, 11785, 14380, 7195, 14380, 6625]
 opcion_fechas = StringVar()
+
+#Se guarda la informacion en el archivo
+archivo_path = "Datos_configuracion.dat"
+if os.path.isfile(archivo_path):
+    with open(archivo_path, 'rb') as archivo:
+        # Carga los datos del archivo pickle
+        datos_guardados = pickle.load(archivo)
+
+    lineas = datos_guardados[0]
+    hora_inicio = datos_guardados[1]
+    hora_final = datos_guardados[2]
+    cant_fallas = datos_guardados[3]
+    cant_meses = datos_guardados[4]
+    dias_reinspeccion = datos_guardados[5]
+    minutos_revision = datos_guardados[6]
+    porcentaje = datos_guardados[7]
+    precios_vehiculos = datos_guardados[8]
+
 
 
 #Funciones
 def crear_citas():
+
     citas = tk.Tk()
     citas.title("Programacion de citas")
     citas.geometry("900x750")
@@ -144,13 +171,13 @@ def crear_citas():
     #E: Vacia
     #S: La creacion y seleccion de las fechas
     def opcion_automatica(): 
-        global hora_final, hora_inicio, meses_para_citas, minutos_revision
+        global hora_final, hora_inicio, cant_meses, minutos_revision
         h_i = hora_inicio
         h_f = hora_final
         #Se muestran las fechas y horas
 
         #Proceso para las fechas
-        cantidad_dias = meses_para_citas * 30
+        cantidad_dias = cant_meses * 30
         # Obtener la fecha actual
         fecha_actual = datetime.date.today()
 
@@ -185,10 +212,11 @@ def crear_citas():
         # Crear el Frame 
         label_horas = Label(citas, text = "Fechas en días")
         label_horas.place(x = 130, y = 540)
+
         frame_dias = tk.Frame(citas)
         frame_dias.place(x = 90, y = 560)
 
-        fechas = tk.Listbox(frame_dias, selectmode=tk.UNITS, width=40)
+        fechas = tk.Listbox(frame_dias, selectmode=tk.UNITS, width=40, height=4)
         fechas.pack(side = 'left',fill = 'y' )
 
         scrollbar_fechas = Scrollbar(frame_dias, orient="vertical",command=fechas.yview)
@@ -203,10 +231,11 @@ def crear_citas():
         # Crear el Frame de las horas
         label_horas = Label(citas, text = "Horas y minutos")
         label_horas.place(x = 430, y = 540)
+
         frame = tk.Frame(citas)
         frame.place(x = 390, y = 560)
 
-        horas = tk.Listbox(frame, selectmode=tk.UNITS, width=40)
+        horas = tk.Listbox(frame, selectmode=tk.UNITS, width=40, height=4)
         horas.pack(side = 'left',fill = 'y' )
 
         scrollbar_horas = Scrollbar(frame, orient="vertical",command=horas.yview)
@@ -216,12 +245,23 @@ def crear_citas():
 
         for elemento in lista_horas_por_dia:
             horas.insert(tk.END, elemento)
+
+
+
+        #Funciones para guardar la informacion de la cita
+        #Botones para guardar la fecha y la hora
+        acep_fecha = tk.Button(citas, text="Guardar fecha", width=10)
+        acep_fecha.place(x = 130, y = 640)
+
+        acep_hora = tk.Button(citas, text= "Guardar hora", width=10)
+        acep_hora.place(x = 430, y = 640)
+
         return
     #Esta funcion se llama cuando el usuario decide solicitar la cita de forma manual
     #E: Vacia
     #S: Validaciones de la fecha
     def opcion_manual():
-        label_fecha = Label(citas, text = "Indique la fecha a solicitar (aa-mm-dd) ")
+        label_fecha = Label(citas, text = "Indique la fecha a solicitar (aaaa-mm-dd) ")
         label_fecha.place(x = 100, y = 540)
         entry_fecha = Entry(citas, width=10)
         entry_fecha.place(x = 320, y = 540)
@@ -235,7 +275,7 @@ def crear_citas():
         #E: vacia
         #S: Un mensaje de afirmacion si esta disponible o no de lo contrario
         def consultar_citas():
-            global hora_final, hora_inicio, minutos_revision, meses_para_citas
+            global hora_final, hora_inicio, minutos_revision, cant_meses
             #Aqui se toman las variables globales para no modificarlas y modificar su contenido
             h_i = hora_inicio
             h_f = hora_final
@@ -260,7 +300,7 @@ def crear_citas():
                 minutos += minutos_revision
 
 
-            cantidad_dias = meses_para_citas * 30
+            cantidad_dias = cant_meses * 30
             # Obtener la fecha actual
             fecha_actual = datetime.date.today()
 
@@ -630,8 +670,190 @@ def salir_de_todo():
 
 def configuracion():
     configuracion = tk.Tk()
-    configuracion.title("Programacion de citas")
-    configuracion.geometry("600x500")
+    configuracion.geometry("900x700")
+
+    label_titulo = tk.Label(configuracion, text= "CONFIGURACION")
+    label_titulo.place(x= 50, )
+
+    label_lineas = tk.Label(configuracion, text="Líneas de trabajo (1-25)")
+    label_lineas.place(x = 50, y = 60)
+    entry_lineas = tk.Entry(configuracion)
+    entry_lineas.place(x = 180, y = 60)
+
+    label_hora_inicio = tk.Label(configuracion, text="Hora inicial (0-23)")
+    label_hora_inicio.place(x = 50, y = 90)
+    entry_hora_inicio = tk.Entry(configuracion)
+    entry_hora_inicio.place(x = 150, y = 90)
+
+    label_hora_final = tk.Label(configuracion, text="Hora final (0-23)")
+    label_hora_final.place(x = 50, y = 120)
+    entry_hora_final = tk.Entry(configuracion)
+    entry_hora_final.place(x = 150, y = 120)
+
+    label_minutos_revision = tk.Label(configuracion, text="Minutos por revisión (20-60)")
+    label_minutos_revision.place(x=50, y = 150)
+    entry_minutos_revision = tk.Entry(configuracion)
+    entry_minutos_revision.place(x=205, y = 150)
+
+    label_dias_naturales_reinspeccion = tk.Label(configuracion, text="Cantidad máxima de días naturales para reinspección (1-60)")
+    label_dias_naturales_reinspeccion.place(x = 50, y = 180)
+    entry_dias_naturales_reinspeccion = tk.Entry(configuracion)
+    entry_dias_naturales_reinspeccion.place(x = 370, y = 180)
+
+    label_cantidad_fallas = tk.Label(configuracion, text="Cantidad de fallas para sacar al vehículo (> 0)")
+    label_cantidad_fallas.place(x = 50, y= 210)
+    entry_cantidad_fallas = tk.Entry(configuracion)
+    entry_cantidad_fallas.place(x= 295, y= 210)
+
+    label_cantidad_meses = tk.Label(configuracion, text= "Cantidad de meses para desplegar las citas disponibles (1-12)")
+    label_cantidad_meses.place(x= 50, y= 240)
+    entry_cantidad_meses = tk.Entry(configuracion)
+    entry_cantidad_meses.place(x= 380, y= 240)
+
+    label_porcentaje = tk.Label(configuracion, text= "Impuesto al valor agregado")
+    label_porcentaje.place(x= 50, y= 270)
+    entry_porcentaje = tk.Entry(configuracion)
+    entry_porcentaje.place(x= 380, y= 270)
+
+    #Tabla con cada tipo de automovil
+    label = tk.Label(configuracion, text="", bd=1, relief="solid")
+    label.place(x=50, y= 300)
+    c = ["Automovil particular y vehiculo de carga liviana (menor o iguala 3500kg)",
+        "Automovil particular y vehiculo de carga liviana (mayor a 3500kg, menor a 8000kg)",
+        "Vehiculo de carga pesada y cabezales (mayor o iguala a 8000kg)",
+        "Taxis",
+        "Autobuses, buses y microbuses",
+        "Motocicletas",
+        "Equipo especial de obras",
+        "Equipo especial agricola (maquinaria agricula)"
+        ]
+    for x in c:
+        texto = label.cget("text")
+        label.config(text=texto+x+"\n"+ "\n")
+
+    #Entrys de cada uno de los automoviles
+    lista_entrys_vehiculos = []
+    salto = 300
+    for x in range(8):
+        entry = tk.Entry(configuracion)
+        entry.place(x= 500, y= salto)
+        lista_entrys_vehiculos.append(entry)
+        salto += 31
+
+
+    def validacion():
+        global lineas, hora_inicio, hora_final, cant_fallas, cant_meses, dias_reinspeccion, minutos_revision, porcentaje, precios_vehiculos
+
+        #Validaciones
+        if entry_lineas.get() == "":
+            lineas = 0
+        else:
+            valor = int(entry_lineas.get())
+            if valor > 0 and valor < 26:
+                lineas = valor
+            else:
+                return messagebox.showerror("Error", "No están en el rango indicado")
+        
+        #----------------------------------------------------------------------------------------------------------------------
+        if entry_hora_inicio.get() == "":
+            hora_inicio = 0
+        else:    
+            valor1 = int(entry_hora_inicio.get())
+            if valor1 >= 0 and valor1 < 24:
+                hora_inicio = valor1
+            else:
+                return messagebox.showerror("Error", "No están en el rango indicado")
+        
+        #----------------------------------------------------------------------------------------------------------------------
+        if entry_hora_final.get() == "":
+            hora_final = 0
+        else:    
+            valor2 = int(entry_hora_final.get())
+            if valor2 > 0 and valor2 < 24 and valor2 >= valor1:
+                hora_final = valor2
+            else:
+                return messagebox.showerror("Error", "No están en el rango indicado")
+        
+        #----------------------------------------------------------------------------------------------------------------------
+        if entry_cantidad_fallas.get() == "":
+            cant_fallas = 0
+        else:    
+            valor3 = int(entry_cantidad_fallas.get())
+            if valor3 > 0 :
+                cant_fallas = valor3
+            else:
+                return messagebox.showerror("Error", "No están en el rango indicado")
+        
+        #----------------------------------------------------------------------------------------------------------------------
+        if entry_cantidad_meses.get() == "":
+            cant_meses = 0
+        else:    
+            valor4 = int(entry_cantidad_meses.get()) 
+            if valor4 > 0 and valor4 < 13:
+                cant_meses = valor4
+            else:
+                return messagebox.showerror("Error", "No están en el rango indicado")
+
+        #----------------------------------------------------------------------------------------------------------------------
+        if entry_dias_naturales_reinspeccion.get() == "":
+            dias_reinspeccion = 0
+        else:    
+            valor5 = int(entry_dias_naturales_reinspeccion.get())
+            if valor5 > 0 and valor5 < 61:
+                dias_reinspeccion = valor5
+            else:
+                return messagebox.showerror("Error", "No están en el rango indicado")
+        
+        #----------------------------------------------------------------------------------------------------------------------
+        if entry_minutos_revision.get() == "":
+            minutos_revision = 0
+        else:    
+            valor6 = int(entry_minutos_revision.get())
+            if valor6 > 19 and valor6 < 61:
+                minutos_revision = valor6
+            else:
+                return messagebox.showerror("Error", "No están en el rango indicado")
+        
+        #----------------------------------------------------------------------------------------------------------------------
+        if entry_porcentaje.get() == "":
+            porcentaje = 0
+        else:    
+            valor7 = float(entry_porcentaje.get())
+            if valor7 >= 0 and valor7 < 21:
+                porcentaje = valor7
+            else:
+                return messagebox.showerror("Error", "No están en el rango indicado")
+
+        #----------------------------------------------------------------------------------------------------------------------
+        #Si realizó cambios en los precios de los vehículos entonces se guardan en la lista
+        for ind, valor in enumerate(precios_vehiculos):
+            if lista_entrys_vehiculos[ind].get() != "":
+                precios_vehiculos[ind] = int(lista_entrys_vehiculos[ind].get())
+
+
+        #Se guarda la informacion en el archivo
+        archivo_path = "Datos_configuracion.dat"
+        if os.path.isfile(archivo_path):
+            # Cargar la lista almacenada en el archivo
+            with open(archivo_path, 'rb') as file:
+                lista_original = pickle.load(file)
+
+            # Modificar la lista según sea necesario
+            datos_guardados = [lineas, hora_inicio, hora_final, cant_fallas, cant_meses, dias_reinspeccion, minutos_revision, porcentaje, precios_vehiculos]
+
+            # Guardar la lista modificada en el archivo
+            with open(archivo_path, 'wb') as file:
+                pickle.dump(datos_guardados, file)
+        else:
+            #Se guardan los datos
+            datos_guardados = [lineas, hora_inicio, hora_final, cant_fallas, cant_meses, dias_reinspeccion, minutos_revision, porcentaje, precios_vehiculos]
+            with open(archivo_path, 'wb') as archivo:
+                pickle.dump(datos_guardados, archivo)
+
+        #Cuando se mete a la condicion de que si está creado el archivo es cuando se abre el programa por primera vez para poner los valores como predeterminados
+
+    b_guardar = tk.Button(configuracion, text= "Guardar informacion", command= validacion)
+    b_guardar.place(x= 50, y= 580)
 
     configuracion.mainloop()
 

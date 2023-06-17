@@ -1008,6 +1008,14 @@ def tablero():
     def comprobacion_comando(comando):
         coman = comando[0]
         placa = comando[1:]
+        if comando == "R":
+            #Se guardan los datos
+            datos_guardados = [lista_textos, colas_lista, placas_revision]
+            archivo_path = "Datos_tablero.dat"
+            with open(archivo_path, 'wb') as archivo:
+                pickle.dump(datos_guardados, archivo)
+
+            table.destroy()
         if coman == "E":
             placa = comando[1:-4]
             falla = comando[-4:]
@@ -1227,7 +1235,7 @@ def tablero():
 
                     comando_T(placa)
                     
-                    #comando_F(placa)
+                
                 
 
 

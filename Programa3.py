@@ -1878,7 +1878,7 @@ def acerca_de():
 
 def ayuda():
     import webbrowser as wb
-    wb.open_new("manual_de_usuario_reteve.docx")
+    wb.open_new("manual_de_usuario_reteve.pdf")
 
 #Botones para acceder a diferentes opciones que solicita el programa
 #Cargar cita

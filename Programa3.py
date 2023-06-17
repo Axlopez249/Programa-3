@@ -1865,7 +1865,12 @@ def configuracion():
     configuracion.mainloop()
 
 
+def acerca_de():
+    return messagebox.showinfo("Info", "Se ha ido avanzando desde que se dejó el programa. Programa: RETEVE. Version: 1.0.0. Fecha de finalización: 18/06/2023. Autores: Arturo Chavarría y Axel López")
 
+def ayuda():
+    import webbrowser as wb
+    wb.open_new("manual_de_usuario_reteve.docx")
 
 #Botones para acceder a diferentes opciones que solicita el programa
 #Cargar cita
@@ -1892,7 +1897,11 @@ b_fallas.place(x=250, y=250)
 b_configuracion = tk.Button(menu_inicial, text = "Configuración del sistema", width = 20, height =2, bg = "PeachPuff4",command=configuracion)
 b_configuracion.place(x=230, y=300)
 
-
+#Menu para desplegar el manual de usuario
+barra_menu = tk.Menu(menu_inicial)
+barra_menu.add_command(label="Acerca de ",command = acerca_de)
+barra_menu.add_command(label="Ayuda", command = ayuda)
+menu_inicial.config(menu=barra_menu)
 menu_inicial.mainloop()
 
 
